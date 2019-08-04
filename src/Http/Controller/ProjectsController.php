@@ -38,7 +38,7 @@ class ProjectsController extends Controller
     {
         return call(function () use ($projectId) {
             /** @var Project|null $project */
-            $project = yield $this->projectRepository->find($projectId);
+            $project = yield Project::find($projectId);
 
             if ($project === null) {
                 return new NotFoundResponse();
