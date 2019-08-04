@@ -6,7 +6,6 @@ namespace App\Http\Controller;
 
 use Amp\Promise;
 use App\Project\Project;
-use App\Project\ProjectRepository;
 use QuantFrame\Http\Controller;
 use QuantFrame\Http\Response\HtmlResponse;
 use QuantFrame\Http\Response\NotFoundResponse;
@@ -19,15 +18,10 @@ class ProjectsController extends Controller
      * @var View
      */
     private $view;
-    /**
-     * @var ProjectRepository
-     */
-    private $projectRepository;
 
-    public function __construct(View $view, ProjectRepository $projectRepository)
+    public function __construct(View $view)
     {
         $this->view              = $view;
-        $this->projectRepository = $projectRepository;
     }
 
     /**
