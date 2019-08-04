@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
 
 use Amp\Http\Server\Options;
 use Amp\Http\Server\Request;
@@ -22,6 +21,8 @@ use function Amp\Http\Server\redirectTo;
 use function QuantFrame\app_env;
 use function QuantFrame\config_path;
 use function QuantFrame\root_path;
+
+require_once __DIR__ . '/framework/bootstrap.php';
 
 /** @var Dispatcher $dispatcher */
 /** @noinspection PhpIncludeInspection */

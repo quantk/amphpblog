@@ -7,9 +7,6 @@ use function QuantFrame\config_path;
 use function QuantFrame\is_production;
 use function QuantFrame\root_path;
 
-$dotenv = Dotenv\Dotenv::create(__DIR__ . '/../');
-$dotenv->load();
-
 /** @noinspection PhpIncludeInspection */
 /** @var array $config */
 $config = require config_path('app.php');
