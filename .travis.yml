@@ -7,4 +7,4 @@ before_install:
 install:
   - composer install --no-interaction --prefer-source
 
-script: psalm --show-info=false
+script: vendor/bin/psalm --show-info=false
