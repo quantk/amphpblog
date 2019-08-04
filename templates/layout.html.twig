@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500&display=swap&subset=cyrillic"
+          rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/mini-default.min.css">
+    <link rel="stylesheet" href="/static/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <header class="row sticky">
+                <div class="col-md-6">
+                    <a href="/" style="padding-left: 10px;" class="logo">Quantick</a>
+                    <a href="/projects" class="button">Projects</a>
+                    <a href="/about" class="button">About me</a>
+                    <a target="_blank" href="https://github.com/drumser" class="button"><i
+                                class="fab fa-github"></i></a>
+                    {% if is_logged_in() %}
+                        <a href="/admin" class="button">Admin</a>
+                    {% endif %}
+                </div>
+            </header>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

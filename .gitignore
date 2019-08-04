@@ -1,0 +1,6 @@
+.idea/
+/var/cache/*
+!/var/cache/.gitkeep
+.env
+vendor/
+node_modules/

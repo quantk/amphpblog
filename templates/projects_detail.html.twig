@@ -1,0 +1,14 @@
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box" style="margin-bottom: 10px;">
+                    <h3 style="">{{ project.title }}</h3>
+                    <p style="margin-top: 0;">{{ project.text | raw }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Projects{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Projects</h1>
+        <a class="button" href="/admin/projects/add">Add</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% for project in projects %}
+                <div class="box">
+                    <h5><a href="/admin/projects/{{ project.id }}">{{ project.title }}[{{ project.id }}]</a></h5>
+                    <p>{{ truncate(project.text) | raw }}</p>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

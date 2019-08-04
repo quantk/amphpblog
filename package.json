@@ -1,0 +1,14 @@
+{
+  "name": "homepage",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@gitlab.com:quantick/homepage.git",
+  "author": "Alexander <mail@kladov.xyz>",
+  "license": "MIT",
+  "dependencies": {
+    "mini.css": "^3.0.1"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.10.0"
+  }
+}

@@ -1,0 +1,34 @@
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+                {% for project in projects %}
+                    <div class="box" style="margin-bottom: 10px;">
+                        <h5 style="margin-bottom: 0;"><a href="/projects/{{ project.id }}">{{ project.title }}</a></h5>
+                        <p style="margin-top: 0;">{{ truncate(project.text) | raw }}</p>
+                    </div>
+                {% else %}
+                    <p>Проектов пока нету..</p>
+                {% endfor %}
+
+                {% if count(projects) > 0 %}
+                    <div class="pagination">
+                        {% if prevPage is not null %}
+                            <a href="{{ prevPage }}">
+                                <button class="primary">Prev</button>
+                            </a>
+                        {% endif %}
+                        {% if nextPage is not null %}
+                            <a href="{{ nextPage }}">
+                                <button class="primary">Next</button>
+                            </a>
+                        {% endif %}
+
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
