@@ -38,6 +38,9 @@
     ]
   },
   "require-dev": {
-    "vimeo/psalm": "^3.4"
+    "vimeo/psalm": "^3.4",
+    "amphp/phpunit-util": "^1.1",
+    "phpunit/phpunit": "^8.3",
+    "sempro/phpunit-pretty-print": "^1.1"
   }
 }
