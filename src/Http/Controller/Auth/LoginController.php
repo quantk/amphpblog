@@ -79,7 +79,7 @@ class LoginController extends Controller
                 /** @var string $password */
                 $password = $request->form->getValue('password');
 
-                $token = yield $this->authManager->authenticate(new Credentials($username, $password));
+                yield $this->authManager->authenticate(new Credentials($username, $password));
                 return new RedirectResponse('/');
             }
 

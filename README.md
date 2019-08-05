@@ -1,6 +1,7 @@
 # Homepage
 [![Build Status](https://travis-ci.org/drumser/homepage.svg?branch=master)](https://travis-ci.org/drumser/homepage)
 [![codecov](https://codecov.io/gh/drumser/homepage/branch/master/graph/badge.svg)](https://codecov.io/gh/drumser/homepage)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/drumser/homepage/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/drumser/homepage/?branch=master)
 
 This is implementation of my website based on amphp/amp and amp components.
 

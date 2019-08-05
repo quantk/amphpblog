@@ -8,8 +8,6 @@ use Amp\Mysql\CommandResult;
 use Amp\Mysql\Pool;
 use Amp\Mysql\ResultSet;
 use Amp\Promise;
-use NilPortugues\Sql\QueryBuilder\Builder\GenericBuilder;
-use NilPortugues\Sql\QueryBuilder\Builder\MySqlBuilder;
 use function Amp\call;
 
 class MysqlStorage implements StorageInterface

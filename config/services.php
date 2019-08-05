@@ -22,7 +22,7 @@ use function QuantFrame\is_production;
 use function QuantFrame\root_path;
 
 return [
-    \Amp\Sql\Pool::class            => static function (ContainerInterface $container): \Amp\Sql\Pool {
+    \Amp\Sql\Pool::class            => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): \Amp\Sql\Pool {
         $config = new ConnectionConfig(
             getenv('DB_HOST') ?: '127.0.0.1',
             (int)getenv('DB_PORT') ?: 3306,
@@ -33,7 +33,7 @@ return [
 
         return new \Amp\Mysql\Pool($config);
     },
-    Environment::class      => static function (ContainerInterface $container): Environment {
+    Environment::class              => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): Environment {
         $appEnv    = app_env() ?? 'local';
         $loader    = new FilesystemLoader(root_path('templates'));
         $cachePath = is_production() ? root_path('var/cache/twig') : false;
@@ -51,7 +51,7 @@ return [
 
         return $twig;
     },
-    StorageInterface::class => static function (ContainerInterface $container): StorageInterface {
+    StorageInterface::class         => static function (ContainerInterface $container): StorageInterface {
         /** @var \Amp\Mysql\Pool $pool */
         $pool    = $container->get(\Amp\Sql\Pool::class);
         $storage = new MysqlStorage($pool);
@@ -60,7 +60,7 @@ return [
 
         return $storage;
     },
-    Client::class           => static function (ContainerInterface $container): Client {
+    Client::class                   => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): Client {
         $host = getenv('REDIS_HOST') ?? 'tcp://127.0.0.1';
         $port = getenv('REDIS_PORT') ?? 6379;
         return new Client("{$host}:{$port}");
@@ -77,7 +77,7 @@ return [
         $provider = $container->get(DatabaseAuthProvider::class);
         return new AuthManager($provider);
     },
-    \Psr\Log\LoggerInterface::class => static function (ContainerInterface $container): LoggerInterface {
+    \Psr\Log\LoggerInterface::class => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): LoggerInterface {
         $handler = new StreamHandler(new ResourceOutputStream(\STDOUT));
         $handler->setFormatter(new ConsoleFormatter());
         $logger = new Logger('homepage');

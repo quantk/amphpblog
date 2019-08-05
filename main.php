@@ -43,16 +43,14 @@ Amp\Loop::run(static function () use ($dispatcher, $container, $port) {
         Amp\Socket\listen("[::]:{$port}"),
     ];
 
-    $requestHandler = new CallableRequestHandler(function (Request $request) use ($dispatcher, $container, $port) {
+    $requestHandler = new CallableRequestHandler(function (Request $request) use ($dispatcher, $container) {
         $routeInfo    = $dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
         $innerRequest = yield \QuantFrame\Http\Request\Request::createFromAmpRequest($request);
         switch ($routeInfo[0]) {
             case FastRoute\Dispatcher::NOT_FOUND:
                 return new Response(Status::NOT_FOUND, []);
-                break;
             case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                 return new Response(Status::METHOD_NOT_ALLOWED, []);
-                break;
             case FastRoute\Dispatcher::FOUND:
                 /** @var Handler $handler */
                 [, $handler, $vars] = $routeInfo;

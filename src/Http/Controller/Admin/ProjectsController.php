@@ -29,7 +29,7 @@ class ProjectsController extends Controller
         View $view
     )
     {
-        $this->view              = $view;
+        $this->view = $view;
     }
 
     /**
@@ -62,7 +62,17 @@ class ProjectsController extends Controller
                     ]));
                 }
 
-                $project        = Project::create();
+                if ($id) {
+                    /** @var Project|null $project */
+                    $project = yield Project::find($id);
+                    if ($project === null) {
+                        return new HtmlResponse($this->view->render('admin/projects/project_add.html.twig', [
+                            'errors' => ['Project not found']
+                        ]));
+                    }
+                } else {
+                    $project = Project::create();
+                }
                 $project->title = $title;
                 $project->text  = $text;
                 yield $project->save();
