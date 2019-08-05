@@ -12,7 +12,7 @@ class Project extends Record
     protected static $table = 'projects';
     /**
      * @var int|null
-     * @Field(type="int")
+     * @Field(type="integer", id=true, autoincrement=true)
      */
     public $id;
     /**

@@ -38,7 +38,10 @@ $dispatcher = FastRoute\simpleDispatcher(static function (FastRoute\RouteCollect
 
         });
         $r->get('/notes', Handler::create(App\Http\Controller\Admin\NotesController::class, 'page', ['secure' => true]));
-        $r->get('/about', Handler::create(App\Http\Controller\Admin\AboutController::class, 'page', ['secure' => true]));
+        $r->addGroup('/about', function (RouteCollector $r) {
+//            $r->get('', Handler::create(App\Http\Controller\Admin\AboutController::class, 'page', ['secure' => true]));
+            $r->addRoute(['GET', 'POST'], '/edit', Handler::create(App\Http\Controller\Admin\AboutController::class, 'edit', ['secure' => true]));
+        });
 
     });
 

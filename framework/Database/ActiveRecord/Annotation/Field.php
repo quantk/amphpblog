@@ -21,4 +21,14 @@ class Field
      * @var string
      */
     public $name;
+
+    /**
+     * @var bool
+     */
+    public $id = false;
+
+    /**
+     * @var bool
+     */
+    public $autoincrement = false;
 }

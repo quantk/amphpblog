@@ -31,6 +31,10 @@ class Record
      * @var StorageInterface
      */
     private static $storage;
+    /**
+     * @var bool
+     */
+    private $exists = false;
 
     /**
      * @param StorageInterface $storage
@@ -181,7 +185,7 @@ class Record
              * @var array $rows
              */
             $rows = yield $query->limit(1)
-                ->where("{$primaryKey} = :id")
+                ->where("`{$primaryKey}` = :id")
                 ->bindValue('id', $id)
                 ->get();
 
@@ -192,15 +196,17 @@ class Record
     /**
      * @param Record $record
      * @param array $row
+     * @param bool $exists
      * @return Record
      * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \ReflectionException
      */
-    public static function hydrate(Record $record, array $row): Record
+    public static function hydrate(Record $record, array $row, bool $exists = true): Record
     {
-        $reader = new AnnotationReader();
-        $r      = new \ReflectionClass($record);
-        $obj    = $record;
+        $reader      = new AnnotationReader();
+        $r           = new \ReflectionClass($record);
+        $obj         = $record;
+        $obj->exists = $exists;
         foreach ($r->getProperties() as $property) {
             /** @var Field|null $ann */
             $ann = $reader->getPropertyAnnotation($property, Field::class);
@@ -211,7 +217,7 @@ class Record
 
             $type = $ann->type;
 
-            switch ($type) {
+            switch (strtolower($type)) {
                 case 'integer':
                 case 'int':
                     $property->setValue($obj, (int)$row[$property->getName()]);
@@ -219,6 +225,9 @@ class Record
                 case 'varchar':
                 case 'text':
                     $property->setValue($obj, (string)$row[$property->getName()]);
+                    break;
+                case 'json':
+                    $property->setValue($obj, json_decode((string)$row[$property->getName()], true));
                     break;
             }
         }
@@ -291,6 +300,11 @@ class Record
              */
             $values = [];
 
+            $valMap = [
+                'basic' => [],
+                'json'  => []
+            ];
+
             foreach ($r->getProperties() as $property) {
                 /** @var Field|null $ann */
                 $ann = $reader->getPropertyAnnotation($property, Field::class);
@@ -303,22 +317,32 @@ class Record
                 /** @var string $fieldName */
                 $fieldName = $ann->name ?? $property->getName();
 
-                if (static::$primaryKey === $fieldName) {
+                if ($ann->id === true && $ann->autoincrement === true && static::$primaryKey === $fieldName) {
                     continue;
                 }
-                /** @var string $val */
-                $val                = $property->getValue($this);
+
+                switch (strtolower($ann->type)) {
+                    case 'json':
+                        $val                        = json_encode($property->getValue($this) ?? []);
+                        $valMap['json'][$fieldName] = $val;
+                        break;
+                    default:
+                        /** @var string $val */
+                        $val                         = $property->getValue($this);
+                        $valMap['basic'][$fieldName] = $val;
+                }
+
                 $values[$fieldName] = $val;
             }
 
             $mode = null;
 
             $primaryKeyValue = $this->getPrimaryKeyValue();
-            if ($primaryKeyValue !== null) {
+            if ($this->exists === true) {
                 $primaryKey = static::$primaryKey;
                 $query      = static::builder()->update()
                     ->table(static::$table)
-                    ->where("{$primaryKey} = :id")
+                    ->where("`{$primaryKey}` = :id")
                     ->bindValue('id', $primaryKeyValue);
                 $mode       = 'update';
             } else {
@@ -332,7 +356,12 @@ class Record
              * @var string|int|bool|null $value
              */
             foreach ($values as $column => $value) {
-                $query->set($column, ':' . $column);
+                if (isset($valMap['json'][$column])) {
+                    $query->set($column, 'CONVERT(:' . $column . ' USING UTF8MB4)');
+                } else {
+                    $query->set($column, ':' . $column);
+                }
+
                 $query->bindValue($column, $value);
             }
 
@@ -345,6 +374,7 @@ class Record
                 }
 
                 $this->setPrimaryKey($result->lastInsertId);
+                $this->exists = true;
             }
 
             return true;

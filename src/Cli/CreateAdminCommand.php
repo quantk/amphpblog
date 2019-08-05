@@ -32,7 +32,9 @@ class CreateAdminCommand extends Command
             }
             $user           = User::create();
             $user->username = 'admin';
-            $user->password = 'admin';
+            /** @var string $hash */
+            $hash           = password_hash('admin', PASSWORD_DEFAULT);
+            $user->password = $hash;
             yield $user->save();
 
             $output->writeln("{$user->id}:{$user->username}");

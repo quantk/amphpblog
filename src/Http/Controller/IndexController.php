@@ -4,6 +4,8 @@
 namespace App\Http\Controller;
 
 
+use Amp\Promise;
+use App\Meta\Meta;
 use App\User\User;
 use QuantFrame\Auth\AuthManager;
 use QuantFrame\Http\Controller;
@@ -51,10 +53,21 @@ class IndexController extends Controller
     }
 
     /**
-     * @return HtmlResponse
+     * @return Promise
      */
-    public function about(): HtmlResponse
+    public function about(): Promise
     {
-        return new HtmlResponse($this->view->render('about.html.twig'));
+        return call(function () {
+            /** @var Meta|null $meta */
+            $meta = yield Meta::find('about');
+            $text = '';
+            if ($meta) {
+                /** @var string $text */
+                $text = $meta->value['text'] ?? '';
+            }
+            return new HtmlResponse($this->view->render('about.html.twig', [
+                'text' => $text
+            ]));
+        });
     }
 }

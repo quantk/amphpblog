@@ -52,6 +52,13 @@ final class Version20190731082141 extends AbstractMigration
         ]);
         $notesTable->addColumn('text', Type::TEXT);
         $notesTable->setPrimaryKey(['id']);
+
+        $metaTable = $schema->createTable('meta');
+        $metaTable->addColumn('key', Type::STRING, [
+            'length' => 255
+        ]);
+        $metaTable->addColumn('value', Type::JSON);
+        $metaTable->setPrimaryKey(['key']);
     }
 
     public function down(Schema $schema): void
@@ -59,5 +66,6 @@ final class Version20190731082141 extends AbstractMigration
         $schema->dropTable('users');
         $schema->dropTable('projects');
         $schema->dropTable('notes');
+        $schema->dropTable('meta');
     }
 }

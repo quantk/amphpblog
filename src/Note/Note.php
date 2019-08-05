@@ -13,7 +13,7 @@ class Note extends Record
 
     /**
      * @var int
-     * @Field(type="integer")
+     * @Field(type="integer", id=true, autoincrement=true)
      */
     public $id;
     /**

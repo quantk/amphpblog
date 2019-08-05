@@ -22,7 +22,7 @@ use function QuantFrame\is_production;
 use function QuantFrame\root_path;
 
 return [
-    \Amp\Sql\Pool::class            => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): \Amp\Sql\Pool {
+    \Amp\Sql\Pool::class => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): \Amp\Mysql\Pool {
         $config = new ConnectionConfig(
             getenv('DB_HOST') ?: '127.0.0.1',
             (int)getenv('DB_PORT') ?: 3306,
@@ -31,9 +31,11 @@ return [
             getenv('DB_NAME') ?: 'homepage'
         );
 
-        return new \Amp\Mysql\Pool($config);
+        /** @var \Amp\Mysql\Pool $pool */
+        $pool = new \Amp\Mysql\Pool($config);
+        return $pool;
     },
-    Environment::class              => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): Environment {
+    Environment::class   => static function (/** @scrutinizer ignore-unused */ ContainerInterface $container): Environment {
         $appEnv    = app_env() ?? 'local';
         $loader    = new FilesystemLoader(root_path('templates'));
         $cachePath = is_production() ? root_path('var/cache/twig') : false;

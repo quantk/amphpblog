@@ -1,0 +1,30 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Projects{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Edit about me</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-6 offset-3">
+            <form action="/admin/about/edit" method="POST">
+                <textarea class="form-control" name="text" id="text" cols="30" rows="10"
+                          placeholder="Enter text">
+                    {{ about | raw }}
+                </textarea>
+                <input class="form-control" type="submit">
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script src="/static/tinymce/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: '#text'
+        });
+    </script>
+{% endblock %}

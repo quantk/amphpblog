@@ -12,7 +12,7 @@ class User extends Record
     protected static $table = 'users';
     /**
      * @var int|null
-     * @Field(type="int")
+     * @Field(type="integer", id=true, autoincrement=true)
      */
     public $id;
     /**
