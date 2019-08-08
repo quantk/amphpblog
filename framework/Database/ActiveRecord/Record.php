@@ -49,7 +49,7 @@ class Record
      * @return string
      * @internal
      */
-    public function getTableName()
+    public function getTableName(): string
     {
         return static::$table;
     }
@@ -75,7 +75,7 @@ class Record
      * @param array $spec
      * @return Select
      */
-    public static function orderBy(array $spec)
+    public static function orderBy(array $spec): Select
     {
         return static::builder()->select()->orderBy($spec);
     }
@@ -84,7 +84,7 @@ class Record
      * @param array $spec
      * @return Select
      */
-    public static function groupBy(array $spec)
+    public static function groupBy(array $spec): Select
     {
         return static::builder()->select()->groupBy($spec);
     }

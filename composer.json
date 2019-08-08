@@ -31,7 +31,8 @@
   "autoload": {
     "psr-4": {
       "App\\": "./src",
-      "QuantFrame\\": "./framework"
+      "QuantFrame\\": "./framework",
+      "Tests\\": "./tests"
     },
     "files": [
       "./framework/functions.php"

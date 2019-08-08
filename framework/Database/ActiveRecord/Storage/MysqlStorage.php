@@ -5,9 +5,9 @@ namespace QuantFrame\Database\ActiveRecord\Storage;
 
 
 use Amp\Mysql\CommandResult;
-use Amp\Mysql\Pool;
 use Amp\Mysql\ResultSet;
 use Amp\Promise;
+use Amp\Sql\Pool;
 use function Amp\call;
 
 class MysqlStorage implements StorageInterface
@@ -24,7 +24,6 @@ class MysqlStorage implements StorageInterface
     public function __construct(Pool $pool)
     {
         $this->pool = $pool;
-
     }
 
     /**
@@ -51,8 +50,6 @@ class MysqlStorage implements StorageInterface
             if ($result instanceof CommandResult) {
                 return StorageResult::create($result->getLastInsertId(), [], $result->getAffectedRowCount());
             }
-
-            throw new \RuntimeException('Invalid result');
         });
 
     }

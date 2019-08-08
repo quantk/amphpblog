@@ -33,6 +33,7 @@ class View
      * @param string $name
      * @param array $context
      * @return string
+     * @throws \Throwable
      */
     public function render(string $name, array $context = []): string
     {
@@ -41,7 +42,7 @@ class View
         } catch (\Throwable $e) {
             $this->logger->critical($e->getMessage());
 
-            return 'error';
+            throw $e;
         }
     }
 }

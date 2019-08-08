@@ -191,4 +191,50 @@ class AuthManagerTest extends AsyncTestCase
         $token = $authManager->authenticate($credentials);
         static::assertNotNull($token);
     }
+
+    public function testIsLoggedIn()
+    {
+        /** @var MockObject|Session $session */
+        $session = $this->createMock(Session::class);
+        $sessid  = 'sdgjqj43h5hdfgsdhgfsdkj52';
+        $session->method('getId')->willReturn($sessid);
+        /** @var AuthProvider $provider */
+        $provider = new class implements AuthProvider
+        {
+            /**
+             * @param string $username
+             * @return Promise|User|null
+             * @psalm-return Promise<User|null>
+             */
+            public function getByUsername(string $username): Promise
+            {
+                return new Failure(new \RuntimeException());
+            }
+
+            /**
+             * @param int $id
+             * @return Promise|User|null
+             * @psalm-return Promise<User|null>
+             */
+            public function getById(int $id): Promise
+            {
+                $user     = User::create();
+                $user->id = $id;
+                return new Success($user);
+            }
+        };
+
+        $authManager = new AuthManager($provider);
+        $authManager->setSession($session);
+        $session->expects(static::never())->method('set')->with(AuthManager::SESSION_KEY, null);
+
+        $userId = 1;
+        $session->method('get')->with(AuthManager::SESSION_KEY)->willReturn(serialize(new UserToken($userId, $sessid)));
+
+        $user = yield $authManager->initialize();
+        static::assertNotNull($user);
+        static::assertNotNull($authManager->getToken());
+
+        static::assertTrue($authManager->isLoggedIn());
+    }
 }
