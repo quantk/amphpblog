@@ -13,6 +13,7 @@ use QuantFrame\Http\Response\RedirectResponse;
 use QuantFrame\Http\Response\Response;
 use QuantFrame\View\View;
 use function Amp\call;
+use function QuantFrame\truncate;
 
 class ProjectsController extends Controller
 {
@@ -43,18 +44,25 @@ class ProjectsController extends Controller
     }
 
     /**
+     * @param int $projectId
      * @return Promise
      */
-    public function edit(): Promise
+    public function edit(int $projectId): Promise
     {
-        return call(function () {
+        return call(function () use ($projectId) {
+            /** @var Project|null $project */
+            $project = yield Project::find($projectId);
+            if ($project === null) {
+                return new NotFoundResponse();
+            }
+
             if ($this->request->method === 'POST') {
                 $errors = [];
 
-                $form  = $this->request->form;
-                $id    = $form->getValue('id');
-                $title = $form->getValue('title');
-                $text  = $form->getValue('text');
+                $form        = $this->request->form;
+                $title       = $form->getValue('title');
+                $text        = $form->getValue('text');
+                $previewText = truncate(strip_tags($text), 400);
                 if (empty($title) || empty($text)) {
                     $errors[] = 'Title or text not found';
                     return new HtmlResponse($this->view->render('admin/projects/project_add.html.twig', [
@@ -62,19 +70,9 @@ class ProjectsController extends Controller
                     ]));
                 }
 
-                if ($id) {
-                    /** @var Project|null $project */
-                    $project = yield Project::find($id);
-                    if ($project === null) {
-                        return new HtmlResponse($this->view->render('admin/projects/project_add.html.twig', [
-                            'errors' => ['Project not found']
-                        ]));
-                    }
-                } else {
-                    $project = Project::create();
-                }
-                $project->title = $title;
-                $project->text  = $text;
+                $project->title       = $title;
+                $project->text        = $text;
+                $project->previewText = $previewText;
                 yield $project->save();
 
                 /** @var int $projectId */
@@ -83,7 +81,9 @@ class ProjectsController extends Controller
                 return new RedirectResponse('/admin/projects/' . $projectId);
             }
 
-            return new HtmlResponse($this->view->render('admin/projects/project_add.html.twig'));
+            return new HtmlResponse($this->view->render('admin/projects/project_add.html.twig', [
+                'project' => $project
+            ]));
         });
     }
 
@@ -106,9 +106,11 @@ class ProjectsController extends Controller
                     ]));
                 }
 
-                $project        = Project::create();
-                $project->title = $title;
-                $project->text  = $text;
+                $project              = Project::create();
+                $project->title       = $title;
+                $project->text        = $text;
+                $project->previewText = truncate(strip_tags($text), 400);
+
                 yield $project->save();
                 /** @var int $projectId */
                 $projectId = $project->id;

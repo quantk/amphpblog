@@ -42,9 +42,7 @@ return [
         $twig      = new Environment($loader, [
             'cache' => $cachePath,
         ]);
-        $twig->addFunction(new TwigFunction('truncate', static function (string $str, int $width = 400) {
-            return strtok(wordwrap($str, $width, "...\n"), "\n");
-        }));
+        $twig->addFunction(new TwigFunction('truncate', Closure::fromCallable('\QuantFrame\truncate')));
         /** @psalm-suppress MissingClosureParamType */
         $twig->addFunction(new TwigFunction('count', static function ($countable) {
             /** @var Countable|array $countable */

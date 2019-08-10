@@ -21,3 +21,8 @@ function is_production(): bool
 {
     return app_env() === 'production';
 }
+
+function truncate(string $str, int $width = 400)
+{
+    return strtok(wordwrap($str, $width, "...\n"), "\n");
+}

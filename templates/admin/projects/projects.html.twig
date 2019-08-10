@@ -12,7 +12,7 @@
             {% for project in projects %}
                 <div class="box">
                     <h5><a href="/admin/projects/{{ project.id }}">{{ project.title }}[{{ project.id }}]</a></h5>
-                    <p>{{ truncate(project.text) | raw }}</p>
+                    <p>{{ project.previewText }}</p>
                 </div>
 
             {% endfor %}

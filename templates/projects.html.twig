@@ -1,5 +1,6 @@
 {% extends 'layout.html.twig' %}
 
+{% block title %}Проекты{% endblock %}
 {% block content %}
     <div class="col-md-12">
         <div class="row">
@@ -7,7 +8,7 @@
                 {% for project in projects %}
                     <div class="box" style="margin-bottom: 10px;">
                         <h5 style="margin-bottom: 0;"><a href="/projects/{{ project.id }}">{{ project.title }}</a></h5>
-                        <p style="margin-top: 0;">{{ truncate(project.text) | raw }}</p>
+                        <p style="margin-top: 0;">{{ truncate(project.previewText) | raw }}</p>
                     </div>
                 {% else %}
                     <p>Проектов пока нету..</p>

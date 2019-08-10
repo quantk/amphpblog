@@ -22,6 +22,11 @@ class Project extends Record
     public $title;
     /**
      * @var string
+     * @Field(type="varchar", name="preview_text")
+     */
+    public $previewText;
+    /**
+     * @var string
      * @Field(type="text")
      */
     public $text;

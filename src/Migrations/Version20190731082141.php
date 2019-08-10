@@ -40,6 +40,9 @@ final class Version20190731082141 extends AbstractMigration
         $projectsTable->addColumn('title', Type::STRING, [
             'length' => 255
         ]);
+        $projectsTable->addColumn('preview_text', Type::STRING, [
+            'length' => 255
+        ]);
         $projectsTable->addColumn('text', Type::TEXT);
         $projectsTable->setPrimaryKey(['id']);
 

@@ -225,17 +225,18 @@ class Record
 
             $type = $ann->type;
 
+            $rowName = $ann->name ?: $property->getName();
             switch (strtolower($type)) {
                 case 'integer':
                 case 'int':
-                    $property->setValue($obj, (int)$row[$property->getName()]);
+                    $property->setValue($obj, (int)$row[$rowName]);
                     break;
                 case 'varchar':
                 case 'text':
-                    $property->setValue($obj, (string)$row[$property->getName()]);
+                    $property->setValue($obj, (string)$row[$rowName]);
                     break;
                 case 'json':
-                    $property->setValue($obj, json_decode((string)$row[$property->getName()], true));
+                    $property->setValue($obj, json_decode((string)$row[$rowName], true));
                     break;
             }
         }
