@@ -303,99 +303,151 @@ class Record
     }
 
     /**
+     * @return AnnotationReader
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     */
+    private static function initializeReader(): AnnotationReader
+    {
+        return new AnnotationReader();
+    }
+
+    /**
+     * @return array<array>
+     * @throws \ReflectionException
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     */
+    private function prepareValues(): array
+    {
+        $reader = self::initializeReader();
+        $r      = new \ReflectionClass($this);
+
+        $valMap = [
+            'basic' => [],
+            'json'  => []
+        ];
+        /**
+         * @var array $values
+         */
+        $values = [];
+        foreach ($r->getProperties() as $property) {
+            /** @var Field|null $ann */
+            $ann = $reader->getPropertyAnnotation($property, Field::class);
+            if (!$ann) {
+                continue;
+            }
+
+            $property->setAccessible(true);
+
+            /** @var string $fieldName */
+            $fieldName = $ann->name ?? $property->getName();
+
+            if ($ann->id === true && $ann->autoincrement === true && static::$primaryKey === $fieldName) {
+                continue;
+            }
+
+            switch (strtolower($ann->type)) {
+                case 'json':
+                    $val                        = json_encode($property->getValue($this) ?? []);
+                    $valMap['json'][$fieldName] = $val;
+                    break;
+                default:
+                    /** @var string $val */
+                    $val                         = $property->getValue($this);
+                    $valMap['basic'][$fieldName] = $val;
+            }
+
+            $values[$fieldName] = $val;
+        }
+
+        return [$valMap, $values];
+    }
+
+    /**
+     * @param array $values
+     * @param array $valMap
+     * @param BaseQuery|Insert|Update $query
+     * @psalm-param Insert|Update $query
+     */
+    private function bindValues(array $values, array $valMap, BaseQuery $query): void
+    {
+        /**
+         * @var string $column
+         * @var string|int|bool|null $value
+         */
+        foreach ($values as $column => $value) {
+            if (isset($valMap['json'][$column])) {
+                $query->set($column, 'CONVERT(:' . $column . ' USING UTF8MB4)');
+            } else {
+                $query->set($column, ':' . $column);
+            }
+
+            $query->bindValue($column, $value);
+        }
+    }
+
+    /**
+     * @param array $values
+     * @param array $valMap
+     * @return Promise<bool>
+     */
+    private function performUpdate(array $values, array $valMap): Promise
+    {
+        return call(function () use ($values, $valMap) {
+            $primaryKey      = static::$primaryKey;
+            $primaryKeyValue = $this->getPrimaryKeyValue();
+
+            $query = static::builder()->update()
+                ->table(static::$table)
+                ->where("`{$primaryKey}` = :id")
+                ->bindValue('id', $primaryKeyValue);
+
+            $this->bindValues($values, $valMap, $query);
+
+            /** @var StorageResult $result */
+            $result = yield self::$storage->execute($query->toSql(), $query->getValues());
+
+            return (int)$result->affectedRowsCount > 0;
+        });
+    }
+
+    /**
+     * @param array $values
+     * @param array $valMap
+     * @return Promise<bool>
+     */
+    private function performInsert(array $values, array $valMap): Promise
+    {
+        return call(function () use ($values, $valMap) {
+            $query = static::builder()->insert()
+                ->into(static::$table);
+
+            $this->bindValues($values, $valMap, $query);
+            /** @var StorageResult $result */
+            $result = yield self::$storage->execute($query->toSql(), $query->getValues());
+            if ($result->lastInsertId === null) {
+                throw new \RuntimeException('lastInsertId is null when insert new row');
+            }
+
+            $this->setPrimaryKey($result->lastInsertId);
+            $this->exists = true;
+
+            return true;
+        });
+    }
+
+    /**
      * @return Promise<bool>
      */
     public function save(): \Amp\Promise
     {
         return call(function () {
-            $reader = new AnnotationReader();
-            $r      = new \ReflectionClass($this);
+            [$valMap, $values] = $this->prepareValues();
 
-            /**
-             * @var array $values
-             */
-            $values = [];
-
-            $valMap = [
-                'basic' => [],
-                'json'  => []
-            ];
-
-            foreach ($r->getProperties() as $property) {
-                /** @var Field|null $ann */
-                $ann = $reader->getPropertyAnnotation($property, Field::class);
-                if (!$ann) {
-                    continue;
-                }
-
-                $property->setAccessible(true);
-
-                /** @var string $fieldName */
-                $fieldName = $ann->name ?? $property->getName();
-
-                if ($ann->id === true && $ann->autoincrement === true && static::$primaryKey === $fieldName) {
-                    continue;
-                }
-
-                switch (strtolower($ann->type)) {
-                    case 'json':
-                        $val                        = json_encode($property->getValue($this) ?? []);
-                        $valMap['json'][$fieldName] = $val;
-                        break;
-                    default:
-                        /** @var string $val */
-                        $val                         = $property->getValue($this);
-                        $valMap['basic'][$fieldName] = $val;
-                }
-
-                $values[$fieldName] = $val;
-            }
-
-            $mode = null;
-
-            $primaryKeyValue = $this->getPrimaryKeyValue();
             if ($this->exists === true) {
-                $primaryKey = static::$primaryKey;
-                $query      = static::builder()->update()
-                    ->table(static::$table)
-                    ->where("`{$primaryKey}` = :id")
-                    ->bindValue('id', $primaryKeyValue);
-                $mode       = 'update';
-            } else {
-                $query = static::builder()->insert()
-                    ->into(static::$table);
-                $mode  = 'insert';
+                return yield $this->performUpdate($values, $valMap);
             }
 
-            /**
-             * @var string $column
-             * @var string|int|bool|null $value
-             */
-            foreach ($values as $column => $value) {
-                if (isset($valMap['json'][$column])) {
-                    $query->set($column, 'CONVERT(:' . $column . ' USING UTF8MB4)');
-                } else {
-                    $query->set($column, ':' . $column);
-                }
-
-                $query->bindValue($column, $value);
-            }
-
-            /** @var StorageResult $result */
-            $result = yield self::$storage->execute($query->toSql(), $query->getValues());
-
-            if ($mode === 'insert') {
-                if ($result->lastInsertId === null) {
-                    throw new \RuntimeException('lastInsertId is null when insert new row');
-                }
-
-                $this->setPrimaryKey($result->lastInsertId);
-                $this->exists = true;
-            } else {
-                return (int)$result->affectedRowsCount > 0;
-            }
-
-            return true;
+            return yield $this->performInsert($values, $valMap);
         });
     }
 }
