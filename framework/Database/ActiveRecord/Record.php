@@ -105,6 +105,14 @@ class Record
     }
 
     /**
+     *
+     */
+    public function setExist(): void
+    {
+        $this->exists = true;
+    }
+
+    /**
      * @param BaseQuery $baseQuery
      * @param array $options
      * @return Promise<array<static>|bool|int>
@@ -268,6 +276,14 @@ class Record
     }
 
     /**
+     * @return bool
+     */
+    public function isExists(): bool
+    {
+        return $this->exists;
+    }
+
+    /**
      * @return Promise
      */
     public function delete(): Promise
@@ -375,6 +391,8 @@ class Record
 
                 $this->setPrimaryKey($result->lastInsertId);
                 $this->exists = true;
+            } else {
+                return (int)$result->affectedRowsCount > 0;
             }
 
             return true;

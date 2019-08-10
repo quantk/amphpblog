@@ -13,7 +13,7 @@ class TestRecord extends Record
 
     /**
      * @var int
-     * @Field(type="int", id=true, autoincrement=false)
+     * @Field(type="int", id=true, autoincrement=true)
      */
     public $id;
 

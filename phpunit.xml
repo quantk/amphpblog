@@ -29,7 +29,7 @@
     </filter>
     <testsuites>
         <testsuite name="Framework tests">
-            <directory>./tests/framework</directory>
+            <directory>./tests</directory>
             <exclude>./vendor</exclude>
         </testsuite>
     </testsuites>
