@@ -365,15 +365,14 @@ class Record
     /**
      * @param array $values
      * @param array $valMap
-     * @param BaseQuery|Insert|Update $query
+     * @param Insert|Update $query
      * @psalm-param Insert|Update $query
      */
-    private function bindValues(array $values, array $valMap, BaseQuery $query): void
+    private function bindValues(array $values, array $valMap, $query): void
     {
         if (!in_array(get_class($query), [Insert::class, Update::class], true)) {
             throw new \RuntimeException('Cannot bind not insert or update values');
         }
-        /** @var Insert|Update $query */
         /**
          * @var string $column
          * @var string|int|bool|null $value
