@@ -61,7 +61,7 @@ class ProjectsController extends Controller
 
                 $form        = $this->request->form;
                 $title       = $form->getValue('title');
-                $text        = $form->getValue('text');
+                $text        = (string)$form->getValue('text');
                 $previewText = truncate(strip_tags($text), 400);
                 if (empty($title) || empty($text)) {
                     $errors[] = 'Title or text not found';
