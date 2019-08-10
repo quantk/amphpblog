@@ -370,6 +370,10 @@ class Record
      */
     private function bindValues(array $values, array $valMap, BaseQuery $query): void
     {
+        if (!in_array(get_class($query), [Insert::class, Update::class], true)) {
+            throw new \RuntimeException('Cannot bind not insert or update values');
+        }
+        /** @var Insert|Update $query */
         /**
          * @var string $column
          * @var string|int|bool|null $value
